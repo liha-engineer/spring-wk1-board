@@ -18,8 +18,8 @@
 
 ### 1. 수정, 삭제 API의 request 방식? (param, query, body)
 -> ~~일단 query는 아닌 것 같고~~ param과 body를 사용하였다. <br>
-Controller 부분을 보면, return type이 ~ResponseDto로서 JSON형태의 body 형식 데이터를 반환함을 알 수 있다. <br>
-또한, 수정과 삭제 API의 매개변수에 @PathVariable Long id가 들어감으로서 param 형식도 사용된 것을 알 수 있다. <br>
+Controller 부분을 보면, return type이 ~ResponseDto로써 JSON형태의 body 형식 데이터를 반환함을 알 수 있다. <br>
+또한, 수정과 삭제 API의 매개변수에 @PathVariable Long id가 들어감으로써 param 형식도 사용된 것을 알 수 있다. <br>
 
 ### 2. 어떤 상황에 어떤 방식의 request를 써야 하나?
 -> query는 RequestParam을 사용. 전달받은 데이터를 URI상에서 찾는 것. 일반적으로 URL에서 ? 뒷부분을 가져올때 사용한다. <br>
