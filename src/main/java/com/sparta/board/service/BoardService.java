@@ -21,14 +21,15 @@ import java.util.List;
 // 뭔진 모르겠지만 얘는 인자값이 필요한 생성자인가보다
 public class BoardService {
     private final JwtUtil jwtUtil;
+    Claims claims;
+
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
-    Claims claims;
+
 
     @Transactional
     public boolean userValidation(@RequestBody HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
-
         boolean valid = false;
         // 토큰검증해서 유효한 경우만 게시물 관련 작업 가능하게 하고싶음
         if (token != null) {
@@ -85,14 +86,11 @@ public class BoardService {
     public SuccessResponseDto delete(Long id, HttpServletRequest request) {
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("해당 아이디의 게시물이 존재하지 않아요!")
-        ); // 토큰 sub에 username 들어가니까, 토큰에 있는 이름이 user DB에 있는지 검색.
+        ); // 토큰 sub에 username 들어가니까, 토큰에 있는 이름이 user DB에 있는지 검색
         User user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
                 () -> new IllegalArgumentException("해당하는 유저가 없습니다.")
         );
-        System.out.println("board.getUsername()은: " + board.getUsername());
-        System.out.println("user.getUsername()은: " + user.getUsername());
-
-        if (userValidation(request) && board.getUsername().equals(claims.getSubject())) {
+        if (userValidation(request) && board.getUsername().equals(userRepository.findByUsername(claims.getSubject()).toString())) {
             boardRepository.deleteById(id);
             return new SuccessResponseDto("삭제 성공", HttpStatus.OK.value());
         } else {

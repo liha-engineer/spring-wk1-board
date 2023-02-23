@@ -1,2 +1,8 @@
-package com.sparta.board.dto;public class CommentRequestDto {
+package com.sparta.board.dto;
+
+import lombok.Getter;
+
+@Getter
+public class CommentRequestDto {
+    private String comment;
 }

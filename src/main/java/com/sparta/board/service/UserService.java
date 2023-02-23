@@ -16,33 +16,32 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserService {
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
-    private static final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
+    private static final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC"; //관리자토큰
 
-    @Transactional
     public SuccessResponseDto signup(SignupRequestDto signupRequestDto) {
         String username = signupRequestDto.getUsername();
-        String password = signupRequestDto.getPassword();
-
         // 회원 중복 확인
         Optional<User> found = userRepository.findByUsername(username);
         if (found.isPresent()) {
-            return new SuccessResponseDto("중복된 사용자가 존재합니다.", HttpStatus.BAD_REQUEST.value());
+            return new SuccessResponseDto("이미 존재하는 username 입니다.", HttpStatus.BAD_REQUEST.value());
         }
 
         UserRoleEnum role = UserRoleEnum.USER;
         if (signupRequestDto.isAdmin()) {
             if (!signupRequestDto.getAdminToken().equals(ADMIN_TOKEN)) {
-                throw new IllegalArgumentException("관리자 암호가 틀려 등록이 불가능합니다.");
+                throw new IllegalArgumentException("관리자 암호가 일치하지 않습니다.");
+            } else {
+                role = UserRoleEnum.ADMIN;
             }
-            role = UserRoleEnum.ADMIN;
         }
-
-        User user = new User(username, password,  role);
+        User user = new User(signupRequestDto);
+        user.setRole(role);
         userRepository.save(user);
         return new SuccessResponseDto("회원가입 성공", HttpStatus.OK.value());
     }
@@ -51,7 +50,7 @@ public class UserService {
     public SuccessResponseDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
         String username = loginRequestDto.getUsername();
         String password = loginRequestDto.getPassword();
-        // 사용자 확인
+        // 사용자 확인 - 이미 등록되어 있는지
         User user = userRepository.findByUsername(username).orElseThrow(
                 () -> new IllegalArgumentException("사용자를 찾을 수 없습니다.")
         );

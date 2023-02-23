@@ -34,6 +34,7 @@ public class UserController {
     public SuccessResponseDto signup(@RequestBody @Valid SignupRequestDto requestDto, Errors errors) {
         //SignupRequestDto 인자값 유효성 검사해서 문제있으면 if문 타게 만듬.
         if(errors.hasErrors()) {
+            // 이거 에러 핸들링 좀더 구체적으로...
             return new SuccessResponseDto("입력값이 유효하지 않습니다.", HttpStatus.BAD_REQUEST.value());
         } return userService.signup(requestDto);
     }
